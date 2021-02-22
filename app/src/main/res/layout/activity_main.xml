@@ -16,5 +16,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LOGIN"
+        android:id="@+id/login"
+        android:backgroundTint="@color/purple_700"
+        android:layout_gravity="center"/>
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
