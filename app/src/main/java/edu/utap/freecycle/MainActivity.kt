@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuItemCompat
+import androidx.navigation.fragment.NavHostFragment
 import edu.utap.freecycle.API.SessionManager
 
 class MainActivity : AppCompatActivity() {
@@ -30,26 +31,26 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        //https://stackoverflow.com/questions/51189835/navigation-architecture-component-splash-screen
+        // Reset the theme to remove the splashscreen
+        setTheme(R.style.Theme_FreeCycle)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Setup observes for the viewModel
         initObservers()
-        sessionManager = SessionManager(this)
 
+        // Check to see if we have logged in the past, reuse that token if still good.
+        sessionManager = SessionManager(this)
         val old_token = sessionManager.fetchAuthToken()
         if (old_token != null) {
             token = old_token
             viewModel.setToken(token)
             viewModel.fetchUser()
         }
-
-        val loginButton = findViewById<Button>(R.id.login)
-        loginButton.setOnClickListener {
-            fetchNewToken()
-        }
     }
 
-    private fun fetchNewToken() {
+    fun fetchNewToken() {
         Log.d("HELP!","AuthLink=" + authorizationLink)
         Log.d("HELP!","ClientId=" + clientId)
         Log.d("HELP!","redirectUri=" + redirectUri)
@@ -80,10 +81,18 @@ class MainActivity : AppCompatActivity() {
         viewModel.observeLoggedIn().observe(this, {
             if (it) {
                 viewModel.fetchPosts()
-                // Transition to homescreen
+                // Homescreen
+                goToHomeScreen()
             }
             // ELSE: Require users to manually login. They need a new token.
         })
+    }
+
+    private fun goToHomeScreen() {
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        navController.navigate(R.id.action_loginScreen_to_homeFragment)
     }
 
     override fun onResume() {
@@ -97,6 +106,7 @@ class MainActivity : AppCompatActivity() {
                 viewModel.setToken(token)
                 sessionManager.saveAuthToken(token)
                 Log.d(javaClass.simpleName, "Token=" + token)
+                goToHomeScreen()
             } else if (uri.getQueryParameter("error") != null) {
                 // Show error message here
                 Toast.makeText(this, uri.getQueryParameter("error"), Toast.LENGTH_SHORT).show()
