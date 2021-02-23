@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         initObservers()
         sessionManager = SessionManager(this)
 
-        var old_token = sessionManager.fetchAuthToken()
+        val old_token = sessionManager.fetchAuthToken()
         if (old_token != null) {
             token = old_token
             viewModel.setToken(token)
@@ -68,13 +68,21 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.observerPosts().observe(this, {
+        viewModel.observePosts().observe(this, {
             if (it != null) {
                 val message = "Title = " + it[0].title
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, "There are no posts!", Toast.LENGTH_SHORT).show()
             }
+        })
+
+        viewModel.observeLoggedIn().observe(this, {
+            if (it) {
+                viewModel.fetchPosts()
+                // Transition to homescreen
+            }
+            // ELSE: Require users to manually login. They need a new token.
         })
     }
 

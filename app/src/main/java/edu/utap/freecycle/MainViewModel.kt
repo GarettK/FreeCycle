@@ -18,6 +18,7 @@ class MainViewModel: ViewModel() {
     private var userData = MutableLiveData<UserAccount>()
     private var posts = MutableLiveData<List<Post>>()
     private var token = MutableLiveData<String>("PLACEHOLDER")
+    private var loggedIn = MutableLiveData<Boolean>(false)
 
     // Set OAuth2 Token
     fun setToken(newToken: String) {
@@ -33,6 +34,7 @@ class MainViewModel: ViewModel() {
                 if (response != null) {
                     Log.d(javaClass.simpleName, response.toString())
                     userData.postValue(response!!)
+                    loggedIn.postValue(true)
                 } else {
                     Log.d(javaClass.simpleName, "NULL RESPONSE FOR USER")
                 }
@@ -60,7 +62,11 @@ class MainViewModel: ViewModel() {
         return userData
     }
 
-    fun observerPosts(): LiveData<List<Post>> {
+    fun observePosts(): LiveData<List<Post>> {
         return posts
+    }
+
+    fun observeLoggedIn(): LiveData<Boolean> {
+        return loggedIn
     }
 }
