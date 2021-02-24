@@ -4,19 +4,20 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import edu.utap.freecycle.MainViewModel
 import edu.utap.freecycle.R
-import edu.utap.freecycle.dummy.DummyContent
+import kotlinx.android.synthetic.main.fragment_home.view.*
 
-/**
- * A fragment representing a list of Items.
- */
+
 class HomeFragment : Fragment() {
 
+    private val viewModel: MainViewModel by activityViewModels()
     private var columnCount = 2
+    private lateinit var adapter: PostAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,23 +27,38 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun initObservers() {
+        viewModel.observePosts().observe(viewLifecycleOwner, {
+            if (it != null) {
+                adapter.submitList(it)
+                adapter.notifyDataSetChanged()
+            }
+        })
+    }
+
+    private fun initAdapter(root: View) {
+        adapter = PostAdapter()
+        root.list.adapter = adapter
+        with(root.list) {
+            layoutManager = when {
+                columnCount <= 1 -> LinearLayoutManager(context)
+                else -> GridLayoutManager(context, columnCount)
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_home_list, container, false)
-
-        // Set the adapter
-        if (view is RecyclerView) {
-            with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                adapter = MyItemRecyclerViewAdapter(DummyContent.ITEMS)
-            }
-        }
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        initAdapter(view)
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initObservers()
     }
 
     companion object {

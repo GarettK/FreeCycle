@@ -1,35 +1,45 @@
 package edu.utap.freecycle.UI
 
+import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import edu.utap.freecycle.API.Post
 import edu.utap.freecycle.R
 
-import edu.utap.freecycle.dummy.DummyContent.DummyItem
 
-/**
- * [RecyclerView.Adapter] that can display a [DummyItem].
- * TODO: Replace the implementation with code for your data type.
- */
-class MyItemRecyclerViewAdapter(
-    private val values: List<DummyItem>
-) : RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder>() {
+class PostAdapter() : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
+
+    private var values: List<Post>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.fragment_home, parent, false)
+            .inflate(R.layout.post_item, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = values[position]
-        holder.idView.text = item.id
-        holder.contentView.text = item.content
+        if (values != null) {
+            val item = values!![position]
+            holder.idView.text = item.title
+           // holder.contentView.text = item.content
+        }
     }
 
-    override fun getItemCount(): Int = values.size
+    override fun getItemCount(): Int {
+        if (values != null) {
+            return values!!.size
+            Log.d("HELP!", values!!.size.toString())
+        } else {
+            return 0
+        }
+    }
+
+    fun submitList(posts: List<Post>) {
+        values = posts
+    }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val idView: TextView = view.findViewById(R.id.item_number)

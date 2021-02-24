@@ -18,6 +18,6 @@
         android:id="@+id/homeFragment"
         android:name="edu.utap.freecycle.UI.HomeFragment"
         android:label="fragment_home_list"
-        tools:layout="@layout/fragment_home_list" />
+        tools:layout="@layout/fragment_home" />
 
 </navigation>
